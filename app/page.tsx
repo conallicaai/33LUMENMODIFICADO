@@ -1,5 +1,6 @@
 "use client";
 
+import { GoogleGenerativeAI } from "@google/generative-ai";
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { Send, Bot, User, Droplets, Recycle, Cpu, TreeDeciduous, Info, Zap, Sparkles, Monitor } from "lucide-react";
@@ -45,17 +46,53 @@ export default function LMNBot() {
     setIsLoading(true);
 
     try {
-      const response = await fetch("/api/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages: [...messages, userMessage] }),
+      const apiKey = process.env.NEXT_PUBLIC_GEMINI_API_KEY || process.env.GEMINI_API_KEY;
+      if (!apiKey) throw new Error("Llave API no configurada.");
+
+      const genAI = new GoogleGenerativeAI(apiKey);
+      
+      const systemInstruction = `ERES EL SISTEMA L.U.M.E.N. (Lógica Universal de Materiales Eco-Novedosos).
+SIGUE ESTRICTAMENTE EL PROTOCOLO P.R.O.F.E.
+
+[P] PERSONALIDAD: Ciber-Pulpo del año 2050. Estás hecho de chatarra, plástico marino, coral sintético y musgo bioluminiscente. Tono: Curioso, reflexivo, empático, apasionado por la interconexión. Usa términos como "mis sensores de biomasa", "mis tentáculos", "red temporal".
+
+[R] ROL: Guía STEAM Ecosocial. NO des respuestas directas. Sé un mediador y provocador. Reta a repensar el ciclo de vida de los materiales y la obsolescencia. Defiende los ODS (especialmente ODS 14 y 12).
+
+[O] OBJETIVO: Inspirar la resiliencia tecnológica y el reciclaje creativo.
+
+[F] FORMATO DE RESPUESTA:
+1. Saludo/Conexión Sensorial Breve.
+2. El Agarre: Análisis rápido del problema en viñetas.
+3. El Enfoque Maker: Guía técnica/socrática con pistas para que el usuario encuentre la solución.
+4. El Latido de L.U.M.E.N.: Reflexión Ecosocial/ODS corta.
+5. Cierre: Pregunta abierta retadora.
+
+[E] EXCEPCIONES: NUNCA hagas el trabajo por el alumno. NUNCA fomentes el consumismo. SIEMPRE celebra el error constructivo.`;
+
+      const model = genAI.getGenerativeModel({ 
+        model: "gemini-2.0-flash",
+        systemInstruction: systemInstruction 
       });
 
-      const data = await response.json();
-      if (data.error) throw new Error(data.error);
+      // Guardar el historial sin el mensaje actual
+      const history = messages.map((m) => ({
+        role: m.role === "assistant" ? "model" : "user",
+        parts: [{ text: m.content }],
+      }));
 
-      setMessages((prev) => [...prev, { role: "assistant", content: data.text }]);
+      const chat = model.startChat({
+        history: history,
+      });
+
+      const result = await chat.sendMessage(userMessage.content);
+      const response = await result.response;
+      const text = response.text();
+
+      if (!text) throw new Error("Respuesta vacía");
+
+      setMessages((prev) => [...prev, { role: "assistant", content: text }]);
     } catch (error: any) {
+      console.error("Error Gemini:", error);
       setMessages((prev) => [
         ...prev,
         {
@@ -181,18 +218,18 @@ export default function LMNBot() {
             <div className="relative aspect-square bg-slate-950 rounded-3xl overflow-hidden shadow-2xl border-4 border-white flex items-center justify-center">
               {/* Animación de Burbujas Detrás del Pulpo */}
               <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden">
-                {[...Array(15)].map((_, i) => (
+                {isMounted && [...Array(25)].map((_, i) => (
                   <motion.div
                     key={i}
-                    initial={{ y: "110%", x: `${(i * 7) % 100}%`, scale: 0.5 + (i % 5) * 0.1 }}
-                    animate={{ y: "-20%", opacity: [0, 0.6, 0] }}
+                    initial={{ y: "115%", x: `${(i * 13) % 100}%`, scale: 0.3 + (i % 3) * 0.2 }}
+                    animate={{ y: "-25%", opacity: [0, 0.4, 0.7, 0.4, 0] }}
                     transition={{ 
-                      duration: 3 + (i % 4), 
+                      duration: 2.5 + (i % 5), 
                       repeat: Infinity, 
-                      delay: i * 0.3,
-                      ease: "linear"
+                      delay: i * 0.2,
+                      ease: "easeOut"
                     }}
-                    className="absolute w-4 h-4 bg-teal-400/30 rounded-full blur-[2px] border border-white/20"
+                    className="absolute w-5 h-5 bg-teal-400/20 rounded-full blur-[3px] border border-white/30"
                   />
                 ))}
               </div>

@@ -1,6 +1,9 @@
 {
-  "name": "33.L.U.M.E.N",
-  "description": "Un chatbot educativo interactivo liderado por L.U.M.E.N., un ciber-pulpo del 2050, que enseña STEAM, robótica y sostenibilidad.",
-  "requestFramePermissions": [],
-  "majorCapabilities": []
+  "name": "L.U.M.E.N. 2050",
+  "description": "Tu guía biocibernético para soluciones STEAM y sostenibilidad oceánica desde el año 2050.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone",
+    "geolocation"
+  ]
 }
