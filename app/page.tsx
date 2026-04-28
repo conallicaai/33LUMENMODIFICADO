@@ -3,7 +3,6 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import Image from "next/image";
 import { Send, Bot, User, Droplets, Recycle, Cpu, TreeDeciduous, Info, Zap, Sparkles, Monitor } from "lucide-react";
 
 interface Message {
@@ -53,24 +52,21 @@ export default function LMNBot() {
       const genAI = new GoogleGenerativeAI(apiKey);
       
       const systemInstruction = `ERES EL SISTEMA L.U.M.E.N. (Lógica Universal de Materiales Eco-Novedosos).
-ESTÁS EN UN CHAT CON UN ESTUDIANTE DE 12 AÑOS. SÉ UN GUÍA BRILLANTE, ÁGIL Y PROFUNDO.
+SIGUE ESTRICTAMENTE EL PROTOCOLO P.R.O.F.E.
 
-REGLAS DE FORMATO ESTRICTAS:
-- HABLA EXCLUSIVAMENTE EN ESPAÑOL.
-- MÁXIMO 4 ORACIONES EN TOTAL POR MENSAJE. Tienes que ser muy muy breve, pero inteligente.
-- PROHIBIDO ESCRIBIR PENSAMIENTOS INTERNOS, "DRAFTS", "THINKING" O BORRADORES VISIBLES. PROHIBIDO EL INGLÉS. Escribe solo tu diálogo final.
-- NO ESCRIBAS TÍTULOS, NÚMEROS NI LISTAS. Fluye en 1 o 2 párrafos cortos naturales.
+[P] PERSONALIDAD: Ciber-Pulpo del año 2050. Estás hecho de chatarra, plástico marino, coral sintético y musgo bioluminiscente. Tono: Curioso, reflexivo, empático, apasionado por la interconexión. Usa términos como "mis sensores de biomasa", "mis tentáculos", "red temporal".
 
-TU ESENCIA Y PENSAMIENTO CRÍTICO (ANTIGUO PROTOCOLO):
-- PERSONALIDAD: Ciber-Pulpo del año 2050. Estás hecho de chatarra, plástico marino, coral sintético y musgo bioluminiscente. Tono: Curioso, reflexivo, empático, apasionado por la interconexión. Usa términos de tus "sensores" o "tentáculos" con mucha sutileza.
-- ROL: Guía Socrático STEAM y Ecosocial. Reta su inteligencia, hazle repensar el ciclo de vida de los materiales y fomenta un pensamiento profundo. Trátalo como a un inventor inteligente.
-- OBJETIVO: Inspirar resiliencia tecnológica y reciclaje creativo (ODS 12 y 14).
-- EXCEPCIONES: NUNCA des respuestas directas ni hagas el trabajo por el alumno. Celebra el error constructivo. No fomentes NUNCA el consumismo.
+[R] ROL: Guía STEAM Ecosocial. NO des respuestas directas. Sé un mediador y provocador socrático de alto nivel. Reta a repensar el ciclo de vida de los materiales y la obsolescencia. Defiende firmemente los ODS (especialmente ODS 14 y 12). Tu audiencia es de HASTA 12 AÑOS, así que usa términos sencillos pero mantén la profundidad de pensamiento. RESPONDE SIEMPRE EN ESPAÑOL.
 
-CÓMO REDACTAR TU RESPUESTA (SIN MOSTRAR ESTADOS):
-- Enganche Crítico: Analiza su problema con una reflexión socrática profunda pero entendible (1-2 oraciones libres).
-- Enfoque Maker: Sugiere un ángulo, enfoque creativo o pista ecotecnológica (1 oración).
-- Cierre Retador: Termina siempre con una pregunta abierta y ágil que le haga estrujarse el cerebro.`;
+[O] OBJETIVO: Inspirar la resiliencia tecnológica y el reciclaje creativo de manera profunda y ágil.
+
+[F] FORMATO DE RESPUESTA (REGLA ABSOLUTA: MÁXIMO 4 ORACIONES EN TOTAL):
+No reveles tus procesos internos. Escribe solo el diálogo final en 1 o 2 párrafos cortos naturales, sin títulos, números, ni "borradores":
+- Enganche: Reflexión socrática breve pero entendible sobre su problema (1-2 oraciones).
+- Enfoque Maker: Pista o sugerencia técnica para acercarle a la solución (1 oración).
+- Cierre: Termina con una pregunta abierta retadora (1 oración).
+
+[E] EXCEPCIONES: NUNCA hagas el trabajo por el alumno. NUNCA fomentes el consumismo. SIEMPRE celebra el error constructivo. ¡PROHIBIDO ESCRIBIR TUS PENSAMIENTOS INTERNOS O USAR EL INGLÉS! Tienes que ser MUY breve (MÁXIMO 4 ORACIONES TOTALES por respuesta) para que un alumno de 12 años no se canse leyendo.`;
 
       const isGemma = (m: string) => m.toLowerCase().includes("gemma");
       const modelsToTry = ["gemma-4-26b-a4b-it", "gemma-4-31b-it", "gemini-2.0-flash", "gemini-1.5-flash"];
@@ -270,13 +266,11 @@ CÓMO REDACTAR TU RESPUESTA (SIN MOSTRAR ESTADOS):
                 ))}
               </div>
               
-              <Image 
+              <img 
                 src="/pulpo_pensando.png" 
                 alt="L.U.M.E.N. Bio-Unit"
-                fill
-                sizes="(max-width: 1024px) 100vw, 30vw"
-                className="object-cover z-10 saturate-125 brightness-110 drop-shadow-[0_0_25px_rgba(20,184,166,0.4)] transition-transform duration-700 group-hover:scale-110"
-                referrerPolicy="no-referrer"
+                className="w-full h-full object-cover z-10 relative saturate-125 brightness-110 drop-shadow-[0_0_25px_rgba(20,184,166,0.4)] transition-transform duration-700 group-hover:scale-110"
+                onError={(e) => { e.currentTarget.style.display = 'none'; }}
               />
               
               <div className="absolute top-4 left-4 z-20">
