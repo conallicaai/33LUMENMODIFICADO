@@ -74,8 +74,14 @@ SIGUE ESTRICTAMENTE EL PROTOCOLO P.R.O.F.E.
         systemInstruction: systemInstruction 
       });
 
-      // Guardar el historial sin el mensaje actual
-      const history = messages.map((m) => ({
+      // Gemini requiere que el historial comience con un mensaje de usuario ('user')
+      let validMessages = messages;
+      if (validMessages.length > 0 && validMessages[0].role === "assistant") {
+        validMessages = validMessages.slice(1);
+      }
+
+      // Guardar el historial sin el mensaje actual usando los mensajes válidos
+      const history = validMessages.map((m) => ({
         role: m.role === "assistant" ? "model" : "user",
         parts: [{ text: m.content }],
       }));
