@@ -3,6 +3,7 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "motion/react";
+import Image from "next/image";
 import { Send, Bot, User, Droplets, Recycle, Cpu, TreeDeciduous, Info, Zap, Sparkles, Monitor } from "lucide-react";
 
 interface Message {
@@ -269,11 +270,13 @@ CÓMO REDACTAR TU RESPUESTA (SIN MOSTRAR ESTADOS):
                 ))}
               </div>
               
-              <img 
+              <Image 
                 src="/pulpo_pensando.png" 
                 alt="L.U.M.E.N. Bio-Unit"
-                className="w-full h-full object-cover z-10 relative saturate-125 brightness-110 drop-shadow-[0_0_25px_rgba(20,184,166,0.4)] transition-transform duration-700 group-hover:scale-110"
-                onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                fill
+                sizes="(max-width: 1024px) 100vw, 30vw"
+                className="object-cover z-10 relative saturate-125 brightness-110 drop-shadow-[0_0_25px_rgba(20,184,166,0.4)] transition-transform duration-700 group-hover:scale-110"
+                referrerPolicy="no-referrer"
               />
               
               <div className="absolute top-4 left-4 z-20">
