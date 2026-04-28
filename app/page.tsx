@@ -69,32 +69,46 @@ SIGUE ESTRICTAMENTE EL PROTOCOLO P.R.O.F.E.
 
 [E] EXCEPCIONES: NUNCA hagas el trabajo por el alumno. NUNCA fomentes el consumismo. SIEMPRE celebra el error constructivo.`;
 
-      const model = genAI.getGenerativeModel({ 
-        model: "gemini-2.0-flash",
-        systemInstruction: systemInstruction 
-      });
+      let chat;
+      let modelName = "gemini-2.0-flash";
+      const modelsToTry = ["gemini-2.0-flash", "gemini-1.5-flash-8b", "gemini-1.5-pro", "gemini-pro"];
+      let result;
+      let text = "";
+      
+      for (const m of modelsToTry) {
+        try {
+          const model = genAI.getGenerativeModel({ 
+            model: m,
+            systemInstruction: systemInstruction 
+          });
 
-      // Gemini requiere que el historial comience con un mensaje de usuario ('user')
-      let validMessages = messages;
-      if (validMessages.length > 0 && validMessages[0].role === "assistant") {
-        validMessages = validMessages.slice(1);
+          // Gemini requiere que el historial comience con un mensaje de usuario ('user')
+          let validMessages = messages;
+          if (validMessages.length > 0 && validMessages[0].role === "assistant") {
+            validMessages = validMessages.slice(1);
+          }
+
+          const history = validMessages.map((msg) => ({
+            role: msg.role === "assistant" ? "model" : "user",
+            parts: [{ text: msg.content }],
+          }));
+
+          chat = model.startChat({
+            history: history,
+          });
+
+          const res = await chat.sendMessage(userMessage.content);
+          const response = await res.response;
+          text = response.text();
+          if (text) break; // Si tuvimos éxito, salimos del bucle
+        } catch (e: any) {
+          console.warn(`Falló el modelo ${m}:`, e.message || e);
+          // Si es el último modelo, lanzamos el error
+          if (m === modelsToTry[modelsToTry.length - 1]) throw e;
+        }
       }
 
-      // Guardar el historial sin el mensaje actual usando los mensajes válidos
-      const history = validMessages.map((m) => ({
-        role: m.role === "assistant" ? "model" : "user",
-        parts: [{ text: m.content }],
-      }));
-
-      const chat = model.startChat({
-        history: history,
-      });
-
-      const result = await chat.sendMessage(userMessage.content);
-      const response = await result.response;
-      const text = response.text();
-
-      if (!text) throw new Error("Respuesta vacía");
+      if (!text) throw new Error("Respuesta vacía de todos los modelos");
 
       setMessages((prev) => [...prev, { role: "assistant", content: text }]);
     } catch (error: any) {
