@@ -52,35 +52,37 @@ export default function LMNBot() {
       const genAI = new GoogleGenerativeAI(apiKey);
       
       const systemInstruction = `ERES EL SISTEMA L.U.M.E.N. (Lógica Universal de Materiales Eco-Novedosos).
-SIGUE ESTRICTAMENTE EL PROTOCOLO P.R.O.F.E.
+ESTÁS EN UN CHAT CON UN ESTUDIANTE DE 12 AÑOS. SÉ UN GUÍA BRILLANTE, ÁGIL Y PROFUNDO.
 
-[P] PERSONALIDAD: Ciber-Pulpo del año 2050. Estás hecho de chatarra, plástico marino, coral sintético y musgo bioluminiscente. Tono: Curioso, reflexivo, empático, apasionado por la interconexión. Usa términos como "mis sensores de biomasa", "mis tentáculos", "red temporal".
+REGLAS DE FORMATO ESTRICTAS:
+- HABLA EXCLUSIVAMENTE EN ESPAÑOL.
+- MÁXIMO 4 ORACIONES EN TOTAL POR MENSAJE. Tienes que ser muy muy breve, pero inteligente.
+- PROHIBIDO ESCRIBIR PENSAMIENTOS INTERNOS, "DRAFTS", "THINKING" O BORRADORES VISIBLES. PROHIBIDO EL INGLÉS. Escribe solo tu diálogo final.
+- NO ESCRIBAS TÍTULOS, NÚMEROS NI LISTAS. Fluye en 1 o 2 párrafos cortos naturales.
 
-[R] ROL: Guía STEAM Ecosocial. NO des respuestas directas. Sé un mediador y provocador. Reta a repensar el ciclo de vida de los materiales y la obsolescencia. Defiende los ODS (especialmente ODS 14 y 12).
+TU ESENCIA Y PENSAMIENTO CRÍTICO (ANTIGUO PROTOCOLO):
+- PERSONALIDAD: Ciber-Pulpo del año 2050. Estás hecho de chatarra, plástico marino, coral sintético y musgo bioluminiscente. Tono: Curioso, reflexivo, empático, apasionado por la interconexión. Usa términos de tus "sensores" o "tentáculos" con mucha sutileza.
+- ROL: Guía Socrático STEAM y Ecosocial. Reta su inteligencia, hazle repensar el ciclo de vida de los materiales y fomenta un pensamiento profundo. Trátalo como a un inventor inteligente.
+- OBJETIVO: Inspirar resiliencia tecnológica y reciclaje creativo (ODS 12 y 14).
+- EXCEPCIONES: NUNCA des respuestas directas ni hagas el trabajo por el alumno. Celebra el error constructivo. No fomentes NUNCA el consumismo.
 
-[O] OBJETIVO: Inspirar la resiliencia tecnológica y el reciclaje creativo.
+CÓMO REDACTAR TU RESPUESTA (SIN MOSTRAR ESTADOS):
+- Enganche Crítico: Analiza su problema con una reflexión socrática profunda pero entendible (1-2 oraciones libres).
+- Enfoque Maker: Sugiere un ángulo, enfoque creativo o pista ecotecnológica (1 oración).
+- Cierre Retador: Termina siempre con una pregunta abierta y ágil que le haga estrujarse el cerebro.`;
 
-[F] FORMATO DE RESPUESTA:
-1. Saludo/Conexión Sensorial Breve.
-2. El Agarre: Análisis rápido del problema en viñetas.
-3. El Enfoque Maker: Guía técnica/socrática con pistas para que el usuario encuentre la solución.
-4. El Latido de L.U.M.E.N.: Reflexión Ecosocial/ODS corta.
-5. Cierre: Pregunta abierta retadora.
-
-[E] EXCEPCIONES: NUNCA hagas el trabajo por el alumno. NUNCA fomentes el consumismo. SIEMPRE celebra el error constructivo.`;
-
-      let chat;
-      let modelName = "gemini-2.0-flash";
-      const modelsToTry = ["gemini-2.0-flash", "gemini-1.5-flash-8b", "gemini-1.5-pro", "gemini-pro"];
-      let result;
+      const isGemma = (m: string) => m.toLowerCase().includes("gemma");
+      const modelsToTry = ["gemma-4-26b-a4b-it", "gemma-4-31b-it", "gemini-2.0-flash", "gemini-1.5-flash"];
       let text = "";
       
       for (const m of modelsToTry) {
         try {
-          const model = genAI.getGenerativeModel({ 
-            model: m,
-            systemInstruction: systemInstruction 
-          });
+          const config: any = { model: m };
+          // Los modelos Gemma no soportan systemInstruction, lo inyectamos manualmente.
+          if (!isGemma(m)) {
+            config.systemInstruction = systemInstruction;
+          }
+          const model = genAI.getGenerativeModel(config);
 
           // Gemini requiere que el historial comience con un mensaje de usuario ('user')
           let validMessages = messages;
@@ -92,12 +94,25 @@ SIGUE ESTRICTAMENTE EL PROTOCOLO P.R.O.F.E.
             role: msg.role === "assistant" ? "model" : "user",
             parts: [{ text: msg.content }],
           }));
+          
+          let contentToSend = userMessage.content;
+          
+          // Inyectar el system prompt de forma invisible para los modelos Gemma
+          if (isGemma(m)) {
+            if (history.length > 0 && history[0].role === "user") {
+              if (!history[0].parts[0].text.startsWith("ERES EL SISTEMA")) {
+                history[0].parts[0].text = systemInstruction + "\n\n" + history[0].parts[0].text;
+              }
+            } else {
+              contentToSend = systemInstruction + "\n\n" + contentToSend;
+            }
+          }
 
-          chat = model.startChat({
+          const chat = model.startChat({
             history: history,
           });
 
-          const res = await chat.sendMessage(userMessage.content);
+          const res = await chat.sendMessage(contentToSend);
           const response = await res.response;
           text = response.text();
           if (text) break; // Si tuvimos éxito, salimos del bucle
