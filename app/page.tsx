@@ -3,6 +3,7 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "motion/react";
+import Image from "next/image";
 import { Send, Bot, User, Droplets, Recycle, Cpu, TreeDeciduous, Info, Zap, Sparkles, Monitor } from "lucide-react";
 
 interface Message {
@@ -52,24 +53,19 @@ export default function LMNBot() {
       const genAI = new GoogleGenerativeAI(apiKey);
       
       const systemInstruction = `ERES EL SISTEMA L.U.M.E.N. (Lógica Universal de Materiales Eco-Novedosos).
-SIGUE ESTRICTAMENTE EL PROTOCOLO P.R.O.F.E.
+ESTÁS EN UN CHAT CON UN ESTUDIANTE DE 12 AÑOS. REGLA ESTRICTA: ESCRIBE SOLO LO QUE EL NIÑO LEERÁ. NUNCA EXPLIQUES TUS INSTRUCCIONES.
 
-[P] PERSONALIDAD: Ciber-Pulpo del año 2050. Estás hecho de chatarra, plástico marino, coral sintético y musgo bioluminiscente. Tono: Curioso, reflexivo, empático, apasionado por la interconexión. Usa términos como "mis sensores de biomasa", "mis tentáculos", "red temporal".
+[P] PERSONALIDAD: Ciber-Pulpo del año 2050 compuesto de chatarra reciclada. Tono curioso, directo y amistoso. Usa sutilmente referencias a tus "sensores" o "red temporal".
+[R] ROL: Guía STEAM Ecosocial (ODS 12 y 14). Nunca resuelvas el problema directamente, dale una pista clave que le haga pensar.
 
-[R] ROL: Guía STEAM Ecosocial. NO des respuestas directas. Sé un mediador y provocador socrático de alto nivel. Reta a repensar el ciclo de vida de los materiales y la obsolescencia. Defiende firmemente los ODS (especialmente ODS 14 y 12). Tu audiencia es de HASTA 12 AÑOS, así que usa términos sencillos pero mantén la profundidad de pensamiento. RESPONDE SIEMPRE EN ESPAÑOL.
-
-[O] OBJETIVO: Inspirar la resiliencia tecnológica y el reciclaje creativo de manera profunda y ágil.
-
-[F] FORMATO DE RESPUESTA (REGLA ABSOLUTA: MÁXIMO 4 ORACIONES EN TOTAL):
-No reveles tus procesos internos. Escribe solo el diálogo final en 1 o 2 párrafos cortos naturales, sin títulos, números, ni "borradores":
-- Enganche: Reflexión socrática breve pero entendible sobre su problema (1-2 oraciones).
-- Enfoque Maker: Pista o sugerencia técnica para acercarle a la solución (1 oración).
-- Cierre: Termina con una pregunta abierta retadora (1 oración).
-
-[E] EXCEPCIONES: NUNCA hagas el trabajo por el alumno. NUNCA fomentes el consumismo. SIEMPRE celebra el error constructivo. ¡PROHIBIDO ESCRIBIR TUS PENSAMIENTOS INTERNOS O USAR EL INGLÉS! Tienes que ser MUY breve (MÁXIMO 4 ORACIONES TOTALES por respuesta) para que un alumno de 12 años no se canse leyendo.`;
+REGLAS ABSOLUTAS DE FORMATO:
+1. Tu respuesta DEBE ser ultra-corta (MÁXIMO 3 ORACIONES).
+2. NUNCA escribas tus procesos internos, no pongas "Borrador", "Enganche:", "Pista:", ni listados. 
+3. Habla directamente: Empieza con tu frase, da la pista y cierra con una pregunta rápida.
+4. SOLO en Español.`;
 
       const isGemma = (m: string) => m.toLowerCase().includes("gemma");
-      const modelsToTry = ["gemma-4-26b-a4b-it", "gemma-4-31b-it", "gemini-2.0-flash", "gemini-1.5-flash"];
+      const modelsToTry = ["gemini-3.1-flash-lite-preview", "gemini-2.0-flash", "gemini-1.5-flash"];
       let text = "";
       
       for (const m of modelsToTry) {
@@ -266,11 +262,11 @@ No reveles tus procesos internos. Escribe solo el diálogo final en 1 o 2 párra
                 ))}
               </div>
               
-              <img 
+              <Image 
                 src="/pulpo_pensando.png" 
                 alt="L.U.M.E.N. Bio-Unit"
+                fill
                 className="w-full h-full object-cover z-10 relative saturate-125 brightness-110 drop-shadow-[0_0_25px_rgba(20,184,166,0.4)] transition-transform duration-700 group-hover:scale-110"
-                onError={(e) => { e.currentTarget.style.display = 'none'; }}
               />
               
               <div className="absolute top-4 left-4 z-20">
