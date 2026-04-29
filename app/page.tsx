@@ -266,7 +266,10 @@ REGLAS ABSOLUTAS DE FORMATO:
                 src="/pulpo_pensando.png" 
                 alt="L.U.M.E.N. Bio-Unit"
                 fill
-                className="w-full h-full object-cover z-10 relative saturate-125 brightness-110 drop-shadow-[0_0_25px_rgba(20,184,166,0.4)] transition-transform duration-700 group-hover:scale-110"
+                priority
+                sizes="(max-width: 1024px) 100vw, 288px"
+                className="object-cover z-10 saturate-125 brightness-110 drop-shadow-[0_0_25px_rgba(20,184,166,0.4)] transition-transform duration-700 group-hover:scale-110"
+                referrerPolicy="no-referrer"
               />
               
               <div className="absolute top-4 left-4 z-20">
